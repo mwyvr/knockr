@@ -1,15 +1,4 @@
-// Package main implements knockr, a port-knocking utility. What is
-// port-knocking?
-//
-// Port-knocking is a network access method that opens normally closed ports on
-// a router or host when a specific sequence of ports has received a connection
-// attempt, usually within a specified and short period of time. The ports can
-// be opened only to the IP address issuing the correct knock sequence, further
-// improving security and resiliency to exploit.
-//
-// Port-knocking can be configured in many commercial router operating systems
-// and even some that are accessible to technical consumers such as Mikrotik
-// RouterOS.
+// Package main implements knockr, a port-knocking utility.
 //
 // Example:
 //
@@ -31,7 +20,6 @@ import (
 
 const delayMS = 50
 
-// TODO provide a toml and env configuration option
 type config struct {
 	network string
 	address string
@@ -49,7 +37,9 @@ func main() {
 	}
 
 	if err := run(c); err != nil {
-		fmt.Printf("\n\nError: %s\n", err)
+		fmt.Printf("Error: %s\n", err)
+		flag.Usage()
+		os.Exit(2)
 	}
 }
 
@@ -64,18 +54,29 @@ func run(c *config) error {
 	flag.Parse()
 
 	if len(c.ports) == 0 {
-		fmt.Printf("knockr: missing port(s)\n\n")
-		flag.Usage()
+		return fmt.Errorf("missing port(s)")
 	}
 
 	if len(flag.Args()) != 1 {
-		fmt.Printf("knockr: missing address\n\n")
-		flag.Usage()
+		return fmt.Errorf("missing address")
 	}
 
 	c.address = flag.Args()[0]
 
 	return portknock(c)
+}
+
+// usage prints the help text
+func usage() {
+	fmt.Printf("Usage:\n\n")
+	flag.PrintDefaults()
+	fmt.Printf(`
+Example:
+
+  # in verbose mode, knock on three ports:
+  knockr -v -p 1234 -p 8923 -p 1233 my.host.name
+  
+`)
 }
 
 // portknock attempts to make a connection to a port(s); we expect timeout or
@@ -142,17 +143,4 @@ func (r *intFlags) String() string {
 	}
 
 	return strings.Join(s, ",")
-}
-
-// usage prints the help text
-func usage() {
-	fmt.Printf("Usage:\n\n")
-	flag.PrintDefaults()
-	fmt.Printf(`
-Example:
-
-  # in verbose mode, knock on three ports:
-  knockr -v -p 1234 -p 8923 -p 1233 my.host.name
-  
-`)
 }
