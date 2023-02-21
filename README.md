@@ -11,7 +11,7 @@ is a single binary. Example usage:
 
 Most Linux / Windows / Mac:
 
-    go install github.com/solutionroute/knockr
+    go install github.com/solutionroute/knockr@latest
 
 Linux distributions not based on `glibc` such as Alpine Linux or
 Void Linux (`musl` variant only):
@@ -19,7 +19,7 @@ Void Linux (`musl` variant only):
     # clone the package and build on your system (any system) 
     git clone https://github.com/solutionroute/knockr.git
     cd knockr
-    CGO_ENABLED=0 go build
+    CGO_ENABLED=0 go install
 
 This will build a statically linked version you can use on any Linux distribution.
 
