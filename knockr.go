@@ -68,10 +68,11 @@ func run(c *config) error {
 	flag.Parse()
 
 	if len(flag.Args()) != 2 {
-		return fmt.Errorf("missing argument(s), need <address> <port1,port2,etc>")
+		return fmt.Errorf("invalid arguments %v", flag.Args())
 	}
 
 	// args are  address port1,port2,port3...
+	// no validation of address is being performed
 	c.address = flag.Args()[0]
 
 	for _, v := range strings.Split(flag.Args()[1], ",") {
@@ -90,9 +91,8 @@ func run(c *config) error {
 	return portknock(c)
 }
 
-// usage prints the help text
 func usage() {
-	fmt.Printf("Usage: knockr [OPTIONS] address port1,port2,port3...\n\n")
+	fmt.Printf("Usage: knockr [OPTIONS] address port1,port2...\n\n")
 	flag.PrintDefaults()
 	fmt.Printf(`
 Example:
