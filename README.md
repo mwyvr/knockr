@@ -2,10 +2,8 @@
 
 `knockr` is a [port-knocking](https://en.wikipedia.org/wiki/Port_knocking)
 utility more convenient to use than `nmap` or `netcat` or other general purpose
-tools. Written in Go to be built on Linux, BSD/Unix, Windows and Mac, `knockr`
-is a single binary. Example usage:
-
-	knockr -v -p 1234 -p 8923 -p 1233 my.host.name
+tools. Written in Go, the utility is a single binary installable on Linux,
+BSD/Unix, Windows and Mac platforms.
 
 ## Installation
 
@@ -16,38 +14,41 @@ Most Linux / Windows / Mac:
 Linux distributions not based on `glibc` such as Alpine Linux or
 Void Linux (`musl` variant only):
 
-    # clone the package and build on your system (any system) 
+    # clone the package and build a version without CGO on your system (any system) 
     git clone https://github.com/solutionroute/knockr.git
-    cd knockr
+
     CGO_ENABLED=0 go install
 
-This will build a statically linked version you can use on any Linux distribution.
+This will build a statically linked version you can use on any Linux
+distribution.
 
 ## Usage
 
 Speak to your network administrator to discover the ports and order required;
 typically two, three or even more ports will form the knocking sequence.
+Default timeout and wait periods should be sufficient for most use cases.
+
+    Usage: knockr [OPTIONS] address port1,port2,port3...
 
     -d duration
             delay between knocks (default 500ms)
     -n string
             network protocol (default "tcp")
-    -p value
-            one or more ports to knock on
+    -s	silent: suppress all but error output
     -t duration
-            timeout for each knock (default 50ms)
-    -v	verbose: report on each step
+            timeout for each knock (default 100ms)
 
     Example:
 
-    # in verbose mode, knock on three ports:
-    knockr -v -p 1234 -p 8923 -p 1233 my.host.name
+    # knock on three ports using the default protocol (tcp) and delays
+    knockr my.host.name 1234,8923,1233
 
-You may choose to include your destination port as the last port in the chain;
-doing so with the `-v` (verbose) option will inform whether the knocking
-operation was successful.
+**Tip**: Include the port you expect to be unlocked as the last port in the
+chain; the status output will inform whether the knocking operation was
+successful. Example, if intending to access 2200:
 
-Default timeout and wait periods should be sufficient for most use cases.
+    # knock on three ports using the default protocol (tcp) and delays
+    knockr my.host.name 1234,8923,1233,2200
 
 ## What is port-knocking?
 
