@@ -34,64 +34,72 @@ import (
 	"time"
 )
 
-const delayMS = 50
+const timeoutMS = 100
 
 type config struct {
 	network string
 	address string
-	ports   intFlags
+	ports   []int
 	delay   time.Duration
 	timeout time.Duration
-	verbose bool
+	silent  bool
 }
 
 func main() {
 	c := &config{
 		network: "tcp",
-		delay:   10 * delayMS * time.Millisecond, // 0.5s
-		timeout: delayMS * time.Millisecond,
+		delay:   5 * timeoutMS * time.Millisecond, // 0.5s
+		timeout: timeoutMS * time.Millisecond,
 	}
 
 	if err := run(c); err != nil {
-		fmt.Printf("Error: %s\n", err)
+		fmt.Printf("error: %s\n\n", err)
 		flag.Usage()
-		os.Exit(2)
+		os.Exit(1)
 	}
 }
 
 func run(c *config) error {
 	flag.Usage = usage
-	flag.Var(&c.ports, "p", "one or more ports to knock on")
-	flag.BoolVar(&c.verbose, "v", c.verbose, "verbose: report on each step")
-	// less commonly used
 	flag.DurationVar(&c.delay, "d", c.delay, "delay between knocks")
 	flag.DurationVar(&c.timeout, "t", c.timeout, "timeout for each knock")
 	flag.StringVar(&c.network, "n", c.network, "network protocol")
+	flag.BoolVar(&c.silent, "s", c.silent, "silent: suppress all but error output")
 	flag.Parse()
 
-	if len(c.ports) == 0 {
-		return fmt.Errorf("missing port(s)")
+	if len(flag.Args()) != 2 {
+		return fmt.Errorf("missing argument(s), need <address> <port1,port2,etc>")
 	}
 
-	if len(flag.Args()) != 1 {
-		return fmt.Errorf("missing address")
-	}
-
+	// args are  address port1,port2,port3...
 	c.address = flag.Args()[0]
+
+	for _, v := range strings.Split(flag.Args()[1], ",") {
+		p, err := strconv.Atoi(v)
+		if err != nil {
+			return err
+		}
+
+		if p < 1 || p > 65535 {
+			return fmt.Errorf("port %d; allowable ports are 1 - 65535", p)
+		}
+
+		c.ports = append(c.ports, p)
+	}
 
 	return portknock(c)
 }
 
 // usage prints the help text
 func usage() {
-	fmt.Printf("Usage:\n\n")
+	fmt.Printf("Usage: knockr [OPTIONS] address port1,port2,port3...\n\n")
 	flag.PrintDefaults()
 	fmt.Printf(`
 Example:
 
-  # in verbose mode, knock on three ports:
-  knockr -v -p 1234 -p 8923 -p 1233 my.host.name
-  
+  # knock on three ports using the default protocol (tcp) and delays
+  knockr my.host.name 1234,8923,1233
+
 `)
 }
 
@@ -119,7 +127,7 @@ func portknock(cfg *config) error {
 			con.Close()
 		}
 
-		if cfg.verbose {
+		if !cfg.silent {
 			log.Printf("%s: %5d %s", cfg.address, v, result)
 		}
 
@@ -127,36 +135,4 @@ func portknock(cfg *config) error {
 	}
 
 	return nil
-}
-
-// intFlags is an implementation of flags.Value allowing for multiple -p <port>
-// flags to be processed
-type intFlags []int
-
-// Set converts a string port value into an integer, appending it in order to
-// the list of supplied ports. Ports will be knocked in this order.
-func (r *intFlags) Set(value string) error {
-	port, err := strconv.Atoi(value)
-	if err != nil {
-		return err
-	}
-
-	if port < 1 || port > 65535 {
-		return fmt.Errorf("port %d; allowable ports are 1 - 65535", port)
-	}
-
-	*r = append(*r, port)
-
-	return nil
-}
-
-// String returns port values as a string joined with ","; this is provided to
-// meet the flags.Value interface and is not currently utilized.
-func (r *intFlags) String() string {
-	s := []string{}
-	for _, v := range *r {
-		s = append(s, fmt.Sprintf("%d", v))
-	}
-
-	return strings.Join(s, ",")
 }
