@@ -11,16 +11,11 @@ Most Linux / Windows / Mac:
 
     go install github.com/solutionroute/knockr@v0.1.1
 
-Linux distributions not based on `glibc` such as Alpine Linux or
-Void Linux (`musl` variant only):
+The Go `net` package includes CGO bindings; Linux distributions not based on
+`glibc` such as Alpine Linux or Void Linux (`musl` variant only) can install a
+statically linked version with:
 
-    # clone the package and build a version without CGO on your system (any system) 
-    git clone https://github.com/solutionroute/knockr.git
-    cd knockr
-    CGO_ENABLED=0 go install
-
-This will build a statically linked version you can use on any Linux
-distribution.
+    CGO_ENABLED=0 go install github.com/solutionroute/knockr@v0.1.1
 
 ## Usage
 
