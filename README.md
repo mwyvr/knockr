@@ -28,7 +28,7 @@ Speak to your network administrator to discover the ports and order required;
 typically two, three or even more ports will form the knocking sequence.
 Default timeout and wait periods should be sufficient for most use cases.
 
-    Usage: knockr [OPTIONS] address port1,port2,port3...
+    Usage: knockr [OPTIONS] address port1,port2...
 
     -d duration
             delay between knocks (default 500ms)
