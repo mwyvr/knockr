@@ -7,6 +7,8 @@ BSD/Unix, Windows and Mac platforms.
 
 ## Installation
 
+### Via the Go toolchain
+
 Most Linux / Windows / Mac:
 
     go install github.com/solutionroute/knockr@v0.1.1
@@ -16,6 +18,20 @@ The Go `net` package includes CGO bindings; Linux distributions not based on
 statically linked version with:
 
     CGO_ENABLED=0 go install github.com/solutionroute/knockr@v0.1.1
+
+### Pre-Built binary or from sources
+
+**Linux**:
+
+The [releases page](https://github.com/solutionroute/knockr/releases)
+provides a link to a non CGO-based binary that will run on various
+Linux distributions.
+
+**Windows and Mac**: Install using the Go toolchain (above) or from source:
+
+    git clone https://github.com/solutionroute/knockr.git
+    cd knockr
+    go install 
 
 ## Usage
 
