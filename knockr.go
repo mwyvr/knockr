@@ -58,7 +58,11 @@ func main() {
 	}
 
 	if err := run(c); err != nil {
-		fmt.Printf("knockr-%v error: %s\n\n", version, err)
+		if version != "" {
+			version = "-" + version
+		}
+
+		fmt.Printf("knockr%v error: %s\n\n", version, err)
 		flag.Usage()
 		os.Exit(1)
 	}
