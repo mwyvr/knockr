@@ -2,32 +2,30 @@
 
 `knockr` is a [port-knocking](https://en.wikipedia.org/wiki/Port_knocking)
 utility more convenient to use than `nmap` or `netcat` or other general purpose
-tools. Written in Go, the utility is a single binary installable on Linux,
-BSD/Unix, Windows and Mac platforms.
+tools. Written in Go, the utility is a single binary installable on any
+platform Go supports including Linux, BSD/Unix, Windows and Mac.
 
 ## Installation
 
-### Via the Go toolchain
+### Via the Go tool chain
 
-Most Linux / Windows / Mac:
+    go install github.com/solutionroute/knockr@v0.2.0
 
-    go install github.com/solutionroute/knockr@v0.1.1
+**Linux without** `glibc`: The Go `net` package includes CGO bindings; Linux
+distributions not based on `glibc` such as Alpine Linux or Void Linux (`musl`
+variant only) can install a statically linked version with:
 
-The Go `net` package includes CGO bindings; Linux distributions not based on
-`glibc` such as Alpine Linux or Void Linux (`musl` variant only) can install a
-statically linked version with:
+    CGO_ENABLED=0 go install github.com/solutionroute/knockr@v0.2.0
 
-    CGO_ENABLED=0 go install github.com/solutionroute/knockr@v0.1.1
+### Other Install Options 
 
-### Pre-Built binary or from sources
-
-**Linux**:
+**Pre-built binary for Linux**:
 
 The [releases page](https://github.com/solutionroute/knockr/releases)
 provides a link to a non CGO-based binary that will run on various
 Linux distributions.
 
-**Windows and Mac**: Install using the Go toolchain (above) or from source:
+**From local sources**: Install using the Go tool chain (above) or from source:
 
     git clone https://github.com/solutionroute/knockr.git
     cd knockr
@@ -35,44 +33,47 @@ Linux distributions.
 
 ## Usage
 
-Speak to your network administrator to discover the ports and order required;
-typically two, three or even more ports will form the knocking sequence.
-Default timeout and wait periods should be sufficient for most use cases.
+*The conservative default timeout and delay durations should be sufficient for
+most use cases.*
 
     Usage: knockr [OPTIONS] address port1,port2...
 
     -d duration
-            delay between knocks (default 500ms)
+            delay between knocks (default 100ms)
     -n string
             network protocol (default "tcp")
     -s	silent: suppress all but error output
     -t duration
-            timeout for each knock (default 100ms)
+            timeout for each knock (default 1.5s)
 
     Example:
 
     # knock on three ports using the default protocol (tcp) and delays
     knockr my.host.name 1234,8923,1233
 
-**Tip**: Include the port you expect to be unlocked as the last port in the
-chain; the status output will inform whether the knocking operation was
-successful. Example, if intending to access 2200:
+**Tip**: Include the port(s) you expect to be unlocked as the first and last
+port in the chain to observe status before and after. For example, if intending
+to unlock port 22 (ssh) on a specific host:
 
-    # knock on three ports using the default protocol (tcp) and delays
-    knockr my.host.name 1234,8923,1233,2200
+    knockr my.host.name 22,1234,18923,1233,22
 
 ## What is port-knocking?
 
-Port-knocking is a network access method that opens normally closed ports on
-a router or host when a specific sequence of ports has received a connection
-attempt, usually within a specified and short period of time.
+Port-knocking is a network access method that opens ports normally left closed
+to the outside world, but only when the right sequence of ports has been
+visited and within time frames determined by your network access configuration.
+That sequence of ports acts as a key.
 
-A network access device like a router will typically be configured such that
-the target port (not necessarily specified in the port-knocking requests) are
-only opened to the IP address issuing the correct knock sequence, further
-improving security and resiliency to exploit.
+knockr is just the remote side of the solution; a network access device like a
+router must be configured.
 
-Port-knocking can be configured in many commercial router operating systems and
-even some that are accessible to technical consumers such as [Mikrotik RouterOS
-devices](https://help.mikrotik.com/docs/display/ROS/Port+knocking).
+Port-knocking can be configured on hosts and many routers including some
+low-cost, high functionality devices accessible to technical consumers such as
+[Mikrotik RouterOS devices](https://help.mikrotik.com/docs/display/ROS/Port+knocking).
 
+Typically the solution will be configured such that the target port (not
+necessarily specified in the port-knocking requests) are only opened to the IP
+address issuing the correct knock sequence, further improving security and
+resiliency to exploit, and reducing port-scanning log burden.
+
+See also: [Wikipedia - port-knocking](https://en.wikipedia.org/wiki/Port_knocking).
