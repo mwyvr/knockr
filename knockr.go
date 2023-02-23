@@ -109,19 +109,21 @@ Example:
 func portknock(cfg *config) error {
 	var result string
 
+	// ensure DNS lookup cached or first ports may not be knocked
+	_, err := net.LookupHost(cfg.address)
+	if err != nil {
+		log.Printf("%s: %5s %s", cfg.address, "DNS", err.Error())
+	}
+
 	for _, v := range cfg.ports {
 		address := fmt.Sprintf("%s:%d", cfg.address, v)
 
 		con, err := net.DialTimeout(cfg.network, address, cfg.timeout)
 		if err != nil {
-			if os.IsTimeout(err) {
-				result = "timeout"
-			} else {
-				result = "error"
-			}
+			result = err.Error()
 		}
 
-		if con != nil {
+		if err == nil && con != nil {
 			result = "open"
 
 			con.Close()
