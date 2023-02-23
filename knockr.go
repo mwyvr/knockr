@@ -48,6 +48,8 @@ type config struct {
 	silent  bool
 }
 
+var version = ""
+
 func main() {
 	c := &config{
 		network: "tcp",
@@ -56,7 +58,7 @@ func main() {
 	}
 
 	if err := run(c); err != nil {
-		fmt.Printf("error: %s\n\n", err)
+		fmt.Printf("knockr-%v error: %s\n\n", version, err)
 		flag.Usage()
 		os.Exit(1)
 	}
