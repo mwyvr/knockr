@@ -35,7 +35,7 @@ import (
 )
 
 const (
-	timeoutMS = 1000
+	timeoutMS = 1500
 	delayMS   = 100
 )
 
