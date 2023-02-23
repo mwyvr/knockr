@@ -2,7 +2,7 @@
 
 `knockr` is a [port-knocking](https://en.wikipedia.org/wiki/Port_knocking)
 utility more convenient to use than `nmap` or `netcat` or other general purpose
-tools. Written in Go, the utility is a single binary installable on any
+tools. Written in Go, the utility is a single binary, installable on any
 platform Go supports including Linux, BSD/Unix, Windows and Mac.
 
 ## Installation
@@ -12,8 +12,9 @@ platform Go supports including Linux, BSD/Unix, Windows and Mac.
     go install github.com/solutionroute/knockr@v0.2.0
 
 **Linux without** `glibc`: The Go `net` package includes CGO bindings; Linux
-distributions not based on `glibc` such as Alpine Linux or Void Linux (`musl`
-variant only) can install a statically linked version with:
+distributions not based on `glibc` such as [Alpine
+Linux](https://www.alpinelinux.org/) or [Void Linux](https://voidlinux.org/)
+(`musl` variant only) can install a statically linked version with:
 
     CGO_ENABLED=0 go install github.com/solutionroute/knockr@v0.2.0
 
@@ -25,7 +26,7 @@ The [releases page](https://github.com/solutionroute/knockr/releases)
 provides a link to a non CGO-based binary that will run on various
 Linux distributions.
 
-**From local sources**: Install using the Go tool chain (above) or from source:
+**From local sources**:
 
     git clone https://github.com/solutionroute/knockr.git
     cd knockr
