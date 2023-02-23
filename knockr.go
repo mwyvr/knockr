@@ -34,7 +34,10 @@ import (
 	"time"
 )
 
-const timeoutMS = 100
+const (
+	timeoutMS = 1000
+	delayMS   = 100
+)
 
 type config struct {
 	network string
@@ -48,7 +51,7 @@ type config struct {
 func main() {
 	c := &config{
 		network: "tcp",
-		delay:   5 * timeoutMS * time.Millisecond, // 0.5s
+		delay:   delayMS * time.Millisecond,
 		timeout: timeoutMS * time.Millisecond,
 	}
 
