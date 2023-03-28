@@ -35,7 +35,7 @@ import (
 )
 
 const (
-	timeoutMS = 1500
+	timeoutMS = 1000
 	delayMS   = 100
 )
 
@@ -124,6 +124,8 @@ func portknock(cfg *config) error {
 		log.Printf("%s: %5s %s", cfg.address, "DNS", err.Error())
 	}
 
+	delay := time.NewTicker(cfg.delay)
+
 	for _, v := range cfg.ports {
 		address := fmt.Sprintf("%s:%d", cfg.address, v)
 
@@ -142,7 +144,7 @@ func portknock(cfg *config) error {
 			log.Printf("%s: %5d %s", cfg.address, v, result)
 		}
 
-		time.Sleep(cfg.delay)
+		<-delay.C
 	}
 
 	return nil
