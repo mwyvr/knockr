@@ -1,9 +1,9 @@
 # knockr
 
 `knockr` is a [port-knocking](https://en.wikipedia.org/wiki/Port_knocking)
-utility more convenient to use than `nmap` or `netcat` or other general purpose
-tools. Written in Go, the utility is a single binary, installable on any
-platform Go supports including Linux, BSD/Unix, Windows and Mac.
+utility potentially more convenient to use than a general purpose tool like 
+`nmap` or `netcat`. Written in Go, the utility is a single binary, installable 
+on any platform Go supports including Linux, BSD/Unix, Windows and Mac.
 
 ## Installation
 
