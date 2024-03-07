@@ -1,3 +1,3 @@
-module github.com/solutionroute/knockr
+module github.com/mwyvr/knockr
 
-go 1.19
+go 1.21
