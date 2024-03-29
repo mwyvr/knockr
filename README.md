@@ -9,32 +9,27 @@ on any platform Go supports including Linux, BSD/Unix, Windows and Mac.
 
 ### Via the Go tool chain
 
-    go install github.com/solutionroute/knockr@v0.2.0
+    go install github.com/mwyvr/knockr@latest
 
 **Linux without** `glibc`: The Go `net` package includes CGO bindings; Linux
 distributions not based on `glibc` such as [Alpine
-Linux](https://www.alpinelinux.org/) or [Void Linux](https://voidlinux.org/)
-(`musl` variant only) can install a statically linked version with:
+Linux](https://www.alpinelinux.org/), [Chimera
+Linux](https://chimera-linux.org/) or [Void Linux](https://voidlinux.org/)
+(`musl` variant) can install a statically linked version with:
 
-    CGO_ENABLED=0 go install github.com/solutionroute/knockr@v0.2.0
+    CGO_ENABLED=0 go install github.com/mwyvr/knockr@latest
 
 ### Other Install Options 
 
 **Pre-built binary for Linux**:
 
-The [releases page](https://github.com/solutionroute/knockr/releases)
+The [releases page](https://github.com/mwyvr/knockr/releases)
 provides a link to a non CGO-based binary that will run on various
 Linux distributions.
 
-**From local sources**:
-
-    git clone https://github.com/solutionroute/knockr.git
-    cd knockr
-    go install 
-
 ## Usage
 
-*The conservative default timeout and delay durations should be sufficient for
+*The default timeout and delay durations should be sufficient for
 most use cases.*
 
     Usage: knockr [OPTIONS] address port1,port2...
@@ -56,7 +51,8 @@ most use cases.*
 port in the chain to observe status before and after. For example, if intending
 to unlock port 22 (ssh) on a specific host:
 
-    knockr my.host.name 22,1234,18923,1233,22
+    # 22 last to demonstrate it has been opened
+    knockr my.host.name 1234,18923,1233,22
 
 ## What is port-knocking?
 
@@ -65,7 +61,7 @@ to the outside world, but only when the right sequence of ports has been
 visited and within time frames determined by your network access configuration.
 That sequence of ports acts as a key.
 
-knockr is just the remote side of the solution; a network access device like a
+knockr is the remote side of the solution; a network access device like a
 router must be configured.
 
 Port-knocking can be configured on hosts and many routers including some
