@@ -11,7 +11,7 @@ flags:
   # - -tags=netgo
 
 # The OS to compile for. `GOOS` env variable will be set to this value.
-goos: linux
+goos: windows
 
 # The architecture to compile for. `GOARCH` env variable will be set to this value.
 goarch: amd64
@@ -25,7 +25,7 @@ goarch: amd64
 # Binary output name.
 # {{ .Os }} will be replaced by goos field in the config file.
 # {{ .Arch }} will be replaced by goarch field in the config file.
-binary: binary-{{ .Os }}-{{ .Arch }}
+binary: knockr-{{ .Os }}-{{ .Arch }}
 
 # (Optional) ldflags generated dynamically in the workflow, and set as the `evaluated-envs` input variables in the workflow.
 ldflags:
