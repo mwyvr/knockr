@@ -46,15 +46,15 @@ type config struct {
 	silent   bool
 }
 
-var version = "" // injected via ldflags
+var Version = "" // injected via ldflags
 
 func main() {
 
 	if err := run(); err != nil {
-		if version != "" {
-			version = "-" + version
+		if Version != "" {
+			Version = "-" + Version
 		}
-		fmt.Printf("knockr%v error: %s\n\n", version, err)
+		fmt.Printf("knockr%v error: %s\n\n", Version, err)
 		flag.Usage()
 		os.Exit(1)
 	}
