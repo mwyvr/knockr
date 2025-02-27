@@ -39,20 +39,18 @@ const (
 	delayMS   = 100
 )
 
-type Config struct {
+type config struct {
 	protocol string
 	delay    time.Duration
 	timeout  time.Duration
 	silent   bool
 }
 
-// TODO debug BuildInfo.Main.Version + info.Settings if not available
-// Or use a script to inject
-var version = ""
+var version = "" // injected via ldflags
 
 func main() {
 
-	if err := Main(); err != nil {
+	if err := run(); err != nil {
 		if version != "" {
 			version = "-" + version
 		}
@@ -62,16 +60,13 @@ func main() {
 	}
 }
 
-func Main() error {
-	var (
-		host  string
-		ports []int
-		cfg   = &Config{
-			protocol: "tcp",
-			delay:    delayMS * time.Millisecond,
-			timeout:  timeoutMS * time.Millisecond,
-		}
-	)
+func run() error {
+
+	cfg := &config{
+		protocol: "tcp",
+		delay:    delayMS * time.Millisecond,
+		timeout:  timeoutMS * time.Millisecond,
+	}
 	// parse options
 	flag.Usage = usage
 	flag.DurationVar(&cfg.delay, "d", cfg.delay, "delay between knocks")
@@ -85,22 +80,19 @@ func Main() error {
 		return fmt.Errorf("invalid arguments %v", flag.Args())
 	}
 
-	host = flag.Args()[0]
-
+	ports := []int{}
 	for _, v := range strings.Split(flag.Args()[1], ",") {
 		p, err := strconv.Atoi(v)
 		if err != nil {
 			return err
 		}
-
 		if p < 1 || p > 65535 {
 			return fmt.Errorf("port %d; allowable ports are 1 - 65535", p)
 		}
-
 		ports = append(ports, p)
 	}
 
-	return portknock(cfg, host, ports)
+	return portknock(cfg, flag.Args()[0], ports)
 }
 
 func usage() {
@@ -111,7 +103,7 @@ Examples:
 
   # knock on three ports using tcp and other defaults
   knockr my.host.name 1234,8923,1233
-  # specify using udp protocol with a 50ms delay between, knock on three ports
+  # using udp protocol with a 50ms delay between, knock on three ports
   knockr -n udp -d 50ms 123.123.123.010 8327,183,420
 
 `)
@@ -119,7 +111,7 @@ Examples:
 
 // portknock attempts to make a connection (tcp) or send a packet (udp) to one
 // or more ports at host.
-func portknock(cfg *Config, host string, ports []int) error {
+func portknock(cfg *config, host string, ports []int) error {
 	var result string
 
 	// if parseable, host is an ip adddress; otherwise we assume a hostname.
