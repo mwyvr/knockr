@@ -1,13 +1,13 @@
 # knockr
 
 `knockr` is a [port-knocking](https://en.wikipedia.org/wiki/Port_knocking)
-utility potentially more convenient to use than general purpose tools like 
-`nmap` or `netcat`. Written in Go, the utility is a single binary, installable 
-on any platform Go supports including Linux, BSD/Unix, Windows and Mac.
+utility potentially more convenient to use than general-purpose tools like 
+`nmap` or `netcat`. Written in Go, the utility is a single binary that is installable
+on any platform Go supports, including Linux, BSD/Unix, Windows, and Mac.
 
 ## Installation
 
-### Via the Go tool chain
+### Via the Go toolchain
 
 Standard:
 
@@ -45,23 +45,23 @@ most use cases.*
       knockr -n udp -d 50ms 123.123.123.010 8327,183,420
 
 **Tip**: Include the port(s) you expect to be unlocked as the first and last
-port in the chain to observe status before and after. For example, if intending
-to unlock port 22 (ssh) on a specific host:
+port in the chain to observe the port status before and after. For example, if
+intending to unlock port 22 (SSH) on a specific host:
 
     knockr my.host.name 22,1234,18923,1233,22
 
 ## What is port-knocking?
 
-Port-knocking is a network access method that opens ports normally closed
-to the outside world, but only when the right sequence of ports has been
+Port-knocking is a network access method that opens ports that are normally closed
+to the outside world, but only when the correct sequence of ports has been
 visited and within time frames determined by your network access configuration.
 
-A host or network protected by port-knocking reduce the log burden from
-internet port scanners and can be another tool to further improve security.
+A host or network protected by port knocking reduces the log burden from
+Internet port scanners can be another tool to improve security further.
 
 Port-knocking can be configured on hosts ([iptables or
 knockd](https://wiki.archlinux.org/title/Port_knocking)), and
-many routers including some low-cost, high functionality devices
+many routers, including some low-cost, high-functionality devices
 accessible to technical consumers such as [Mikrotik RouterOS
 devices](https://help.mikrotik.com/docs/display/ROS/Port+knocking).
 
