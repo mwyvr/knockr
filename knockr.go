@@ -69,10 +69,10 @@ func run() error {
 	}
 	// parse options
 	flag.Usage = usage
-	flag.DurationVar(&cfg.delay, "d", cfg.delay, "delay between knocks")
-	flag.DurationVar(&cfg.timeout, "t", cfg.timeout, "timeout for each knock")
-	flag.StringVar(&cfg.protocol, "n", cfg.protocol, "network protocol (tcp, udp)")
-	flag.BoolVar(&cfg.silent, "s", cfg.silent, "silence all but error output")
+	flag.DurationVar(&cfg.delay, "d", cfg.delay, "`delay` between knocks")
+	flag.DurationVar(&cfg.timeout, "t", cfg.timeout, "`timeout` for each knock")
+	flag.StringVar(&cfg.protocol, "n", cfg.protocol, "`network protocol` (tcp, udp)")
+	flag.BoolVar(&cfg.silent, "s", cfg.silent, "`silence` all but error output")
 	flag.Parse()
 
 	// parse required args: address port1,port2,port3...
@@ -96,15 +96,16 @@ func run() error {
 }
 
 func usage() {
-	fmt.Printf("Usage: knockr [OPTIONS] hostname-or-address port1,port2...\n\n")
+	fmt.Printf("USAGE\n\nknockr [options] hostname-or-address port1,port2...\n\nOPTIONS\n\n")
 	flag.PrintDefaults()
 	fmt.Printf(`
-Examples:
+EXAMPLES
 
-  # knock on three ports using tcp and other defaults
-  knockr my.host.name 1234,8923,1233
-  # using udp protocol with a 50ms delay between, knock on three ports
-  knockr -n udp -d 50ms 123.123.123.010 8327,183,420
+  Knock using default options:
+    knockr somehost.example.com 1234,8923,1233
+  
+  Using udp protocol and 50ms delay between knocks:
+    knockr -n udp -d 50ms 23.192.228.80 51213,8327,183,420
 
 `)
 }

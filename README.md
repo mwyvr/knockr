@@ -28,22 +28,26 @@ for various operating systems and architectures.
 *The default timeout and delay durations should be sufficient for
 most use cases.*
 
-    Usage: knockr [OPTIONS] hostname-or-address port1,port2...
+  knockr [options] hostname-or-address port1,port2...
 
-    -d duration
-            delay between knocks (default 100ms)
-    -n string
-            network protocol (tcp, udp) (default "tcp")
-    -s	silence all but error output
-    -t duration
-            timeout for each knock (default 1s)
+  OPTIONS
 
-    Examples:
+    -d delay
+      	delay between knocks (default 100ms)
+    -n network protocol
+      	network protocol (tcp, udp) (default "tcp")
+    -s silence
+      	silence all but error output
+    -t timeout
+      	timeout for each knock (default 1s)
 
-      # knock on three ports using tcp and other defaults
-      knockr my.host.name 1234,8923,1233
-      # using udp protocol with a 50ms delay between, knock on three ports
-      knockr -n udp -d 50ms 123.123.123.010 8327,183,420
+  EXAMPLES
+
+    Knock using default options:
+      knockr somehost.example.com 1234,8923,1233
+  
+    Using udp protocol and 50ms delay between knocks:
+      knockr -n udp -d 50ms 23.192.228.80 51213,8327,183,420
 
 **Tip**: Include the port(s) you expect to be unlocked as the first and last
 port in the chain to observe the port status before and after. For example, if
