@@ -1,9 +1,10 @@
 # knockr
 
 `knockr` is a [port-knocking](https://en.wikipedia.org/wiki/Port_knocking)
-utility potentially more convenient to use than general-purpose tools like 
-`nmap` or `netcat`. Written in Go, the utility is a single binary that is installable
-on any platform Go supports, including Linux, BSD/Unix, Windows, and Mac.
+utility potentially more convenient to use than general-purpose tools like
+`nmap` or `netcat`. Written in Go, the utility is a single binary that is
+installable on any platform Go supports, including Linux, BSD/Unix, Windows,
+and Mac.
 
 ## Installation
 
@@ -52,12 +53,14 @@ intending to unlock port 22 (SSH) on a specific host:
 
 ## What is port-knocking?
 
-Port-knocking is a network access method that opens ports that are normally closed
-to the outside world, but only when the correct sequence of ports has been
-visited and within time frames determined by your network access configuration.
+Port-knocking is a network access method that opens ports that are normally
+closed to the outside world, but only when the correct sequence of ports
+has been visited and within time frames determined by your network access
+configuration.
 
 A host or network protected by port knocking reduces the log burden from
-Internet port scanners can be another tool to improve security further.
+Internet port scanners and should only be seen as another tool to improve
+security.
 
 Port-knocking can be configured on hosts ([iptables or
 knockd](https://wiki.archlinux.org/title/Port_knocking)), and
