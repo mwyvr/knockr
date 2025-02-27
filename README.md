@@ -1,7 +1,7 @@
 # knockr
 
 `knockr` is a [port-knocking](https://en.wikipedia.org/wiki/Port_knocking)
-utility potentially more convenient to use than a general purpose tool like 
+utility potentially more convenient to use than general purpose tools like 
 `nmap` or `netcat`. Written in Go, the utility is a single binary, installable 
 on any platform Go supports including Linux, BSD/Unix, Windows and Mac.
 
@@ -9,68 +9,60 @@ on any platform Go supports including Linux, BSD/Unix, Windows and Mac.
 
 ### Via the Go tool chain
 
+Standard:
+
     go install github.com/mwyvr/knockr@latest
 
-**Linux without** `glibc`: The Go `net` package includes CGO bindings; Linux
-distributions not based on `glibc` such as [Alpine
-Linux](https://www.alpinelinux.org/), [Chimera
-Linux](https://chimera-linux.org/) or [Void Linux](https://voidlinux.org/)
-(`musl` variant) can install a statically linked version with:
+Without CGO:
 
     CGO_ENABLED=0 go install github.com/mwyvr/knockr@latest
 
-### Other Install Options 
+### Pre-built binaries
 
-**Pre-built binary for Linux**:
-
-The [releases page](https://github.com/mwyvr/knockr/releases)
-provides a link to a non CGO-based binary that will run on various
-Linux distributions.
+The [releases page](https://github.com/mwyvr/knockr/releases) provides binaries
+for various operating systems and architectures.
 
 ## Usage
 
 *The default timeout and delay durations should be sufficient for
 most use cases.*
 
-    Usage: knockr [OPTIONS] address port1,port2...
+    Usage: knockr [OPTIONS] hostname-or-address port1,port2...
 
     -d duration
             delay between knocks (default 100ms)
     -n string
-            network protocol (default "tcp")
-    -s	silent: suppress all but error output
+            network protocol (tcp, udp) (default "tcp")
+    -s	silence all but error output
     -t duration
-            timeout for each knock (default 1.5s)
+            timeout for each knock (default 1s)
 
-    Example:
+    Examples:
 
-    # knock on three ports using the default protocol (tcp) and delays
-    knockr my.host.name 1234,8923,1233
+      # knock on three ports using tcp and other defaults
+      knockr my.host.name 1234,8923,1233
+      # using udp protocol with a 50ms delay between, knock on three ports
+      knockr -n udp -d 50ms 123.123.123.010 8327,183,420
 
 **Tip**: Include the port(s) you expect to be unlocked as the first and last
 port in the chain to observe status before and after. For example, if intending
 to unlock port 22 (ssh) on a specific host:
 
-    # 22 last to demonstrate it has been opened
-    knockr my.host.name 1234,18923,1233,22
+    knockr my.host.name 22,1234,18923,1233,22
 
 ## What is port-knocking?
 
-Port-knocking is a network access method that opens ports normally left closed
+Port-knocking is a network access method that opens ports normally closed
 to the outside world, but only when the right sequence of ports has been
 visited and within time frames determined by your network access configuration.
-That sequence of ports acts as a key.
 
-knockr is the remote side of the solution; a network access device like a
-router must be configured.
+A host or network protected by port-knocking reduce the log burden from
+internet port scanners and can be another tool to further improve security.
 
-Port-knocking can be configured on hosts and many routers including some
-low-cost, high functionality devices accessible to technical consumers such as
-[Mikrotik RouterOS devices](https://help.mikrotik.com/docs/display/ROS/Port+knocking).
-
-Typically the solution will be configured such that the target port (not
-necessarily specified in the port-knocking requests) are only opened to the IP
-address issuing the correct knock sequence, further improving security and
-resiliency to exploit, and reducing port-scanning log burden.
+Port-knocking can be configured on hosts ([iptables or
+knockd](https://wiki.archlinux.org/title/Port_knocking)), and
+many routers including some low-cost, high functionality devices
+accessible to technical consumers such as [Mikrotik RouterOS
+devices](https://help.mikrotik.com/docs/display/ROS/Port+knocking).
 
 See also: [Wikipedia - port-knocking](https://en.wikipedia.org/wiki/Port_knocking).
