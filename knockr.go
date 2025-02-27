@@ -39,62 +39,53 @@ const (
 	delayMS   = 100
 )
 
-type config struct {
-	network string
-	address string
-	is_ip   bool
-	ports   []int
-	delay   time.Duration
-	timeout time.Duration
-	silent  bool
+type Config struct {
+	protocol string
+	delay    time.Duration
+	timeout  time.Duration
+	silent   bool
 }
 
+// TODO debug BuildInfo.Main.Version + info.Settings if not available
+// Or use a script to inject
 var version = ""
 
 func main() {
-	c := &config{
-		network: "tcp",
-		delay:   delayMS * time.Millisecond,
-		timeout: timeoutMS * time.Millisecond,
-	}
 
-	if err := run(c); err != nil {
+	if err := Main(); err != nil {
 		if version != "" {
 			version = "-" + version
 		}
-
 		fmt.Printf("knockr%v error: %s\n\n", version, err)
 		flag.Usage()
 		os.Exit(1)
 	}
 }
 
-func run(c *config) error {
+func Main() error {
+	var (
+		host  string
+		ports []int
+		cfg   = &Config{
+			protocol: "tcp",
+			delay:    delayMS * time.Millisecond,
+			timeout:  timeoutMS * time.Millisecond,
+		}
+	)
+	// parse options
 	flag.Usage = usage
-	flag.DurationVar(&c.delay, "d", c.delay, "delay between knocks")
-	flag.DurationVar(&c.timeout, "t", c.timeout, "timeout for each knock")
-	flag.StringVar(&c.network, "n", c.network, "network protocol")
-	flag.BoolVar(&c.silent, "s", c.silent, "silent: suppress all but error output")
+	flag.DurationVar(&cfg.delay, "d", cfg.delay, "delay between knocks")
+	flag.DurationVar(&cfg.timeout, "t", cfg.timeout, "timeout for each knock")
+	flag.StringVar(&cfg.protocol, "n", cfg.protocol, "network protocol (tcp, udp)")
+	flag.BoolVar(&cfg.silent, "s", cfg.silent, "silence all but error output")
 	flag.Parse()
 
+	// parse required args: address port1,port2,port3...
 	if len(flag.Args()) != 2 {
 		return fmt.Errorf("invalid arguments %v", flag.Args())
 	}
 
-	// args are  address port1,port2,port3...
-	ip := net.ParseIP(flag.Args()[0])
-	if ip == nil {
-		// if unparsable, we assume address arg is a hostname
-		c.address = flag.Args()[0]
-	} else {
-		c.is_ip = true
-		if ip.To4() != nil {
-			c.address = ip.String()
-		} else {
-			// format ipv6 appropriately for net.dial
-			c.address = fmt.Sprintf("[%s]", ip.String())
-		}
-	}
+	host = flag.Args()[0]
 
 	for _, v := range strings.Split(flag.Args()[1], ",") {
 		p, err := strconv.Atoi(v)
@@ -106,61 +97,79 @@ func run(c *config) error {
 			return fmt.Errorf("port %d; allowable ports are 1 - 65535", p)
 		}
 
-		c.ports = append(c.ports, p)
+		ports = append(ports, p)
 	}
 
-	return portknock(c)
+	return portknock(cfg, host, ports)
 }
 
 func usage() {
-	fmt.Printf("Usage: knockr [OPTIONS] address port1,port2...\n\n")
+	fmt.Printf("Usage: knockr [OPTIONS] hostname-or-address port1,port2...\n\n")
 	flag.PrintDefaults()
 	fmt.Printf(`
-Example:
+Examples:
 
-  # knock on three ports at my.host.name using the default protocol (tcp) and delays
+  # knock on three ports using tcp and other defaults
   knockr my.host.name 1234,8923,1233
-  # ipv4 and ipv6 addresses are supported
-  knockr 123.123.123.010 1234,8923,1233
+  # specify using udp protocol with a 50ms delay between, knock on three ports
+  knockr -n udp -d 50ms 123.123.123.010 8327,183,420
 
 `)
 }
 
-// portknock attempts to make a connection to a port(s); we expect timeout or
-// other errors for ports being used as a port-knocking scheme by a router or
-// network defense system.
-func portknock(cfg *config) error {
+// portknock attempts to make a connection (tcp) or send a packet (udp) to one
+// or more ports at host.
+func portknock(cfg *Config, host string, ports []int) error {
 	var result string
 
-	// ensure DNS lookup cached or first ports may not be knocked
-	if !cfg.is_ip {
-		_, err := net.LookupHost(cfg.address)
+	// if parseable, host is an ip adddress; otherwise we assume a hostname.
+	ip := net.ParseIP(host)
+	if ip == nil {
+		// hostname: ensure DNS lookup is cached or first ports may not be knocked
+		_, err := net.LookupHost(host)
 		if err != nil {
-			log.Printf("%s: %5s %s", cfg.address, "DNS", err.Error())
+			return err
+		}
+	} else {
+		if ip.To4() != nil {
+			host = ip.String()
+		} else {
+			// format ipv6 appropriately for net.DialTimeout
+			host = fmt.Sprintf("[%s]", ip.String())
 		}
 	}
 
 	delay := time.NewTicker(cfg.delay)
 
-	for _, v := range cfg.ports {
-		address := fmt.Sprintf("%s:%d", cfg.address, v)
+	for _, port := range ports {
+		address := fmt.Sprintf("%s:%d", host, port)
 
-		con, err := net.DialTimeout(cfg.network, address, cfg.timeout)
+		con, err := net.DialTimeout(cfg.protocol, address, cfg.timeout)
 		if err != nil {
 			result = err.Error()
+		} else {
+			switch cfg.protocol {
+			case "tcp":
+				result = "open"
+			case "udp":
+				// no handshake with a connectionless protocol, so send a DECAFBAD packet
+				_, err := con.Write([]byte{0xDE, 0xCA, 0xFB, 0xAD})
+				if err != nil {
+					result = err.Error()
+				} else {
+					result = "udp packet sent"
+				}
+			}
 		}
-
-		if err == nil && con != nil {
-			result = "open"
+		if con != nil {
 			con.Close()
 		}
 
 		if !cfg.silent {
-			log.Printf("%s: %5d %s", cfg.address, v, result)
+			log.Printf("%s %5d %s", host, port, result)
 		}
 
 		<-delay.C
 	}
-
 	return nil
 }
