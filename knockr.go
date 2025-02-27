@@ -42,6 +42,7 @@ const (
 type config struct {
 	network string
 	address string
+	is_ip   bool
 	ports   []int
 	delay   time.Duration
 	timeout time.Duration
@@ -81,8 +82,19 @@ func run(c *config) error {
 	}
 
 	// args are  address port1,port2,port3...
-	// no validation of address is being performed
-	c.address = flag.Args()[0]
+	ip := net.ParseIP(flag.Args()[0])
+	if ip == nil {
+		// if unparsable, we assume address arg is a hostname
+		c.address = flag.Args()[0]
+	} else {
+		c.is_ip = true
+		if ip.To4() != nil {
+			c.address = ip.String()
+		} else {
+			// format ipv6 appropriately for net.dial
+			c.address = fmt.Sprintf("[%s]", ip.String())
+		}
+	}
 
 	for _, v := range strings.Split(flag.Args()[1], ",") {
 		p, err := strconv.Atoi(v)
@@ -106,8 +118,10 @@ func usage() {
 	fmt.Printf(`
 Example:
 
-  # knock on three ports using the default protocol (tcp) and delays
+  # knock on three ports at my.host.name using the default protocol (tcp) and delays
   knockr my.host.name 1234,8923,1233
+  # ipv4 and ipv6 addresses are supported
+  knockr 123.123.123.010 1234,8923,1233
 
 `)
 }
@@ -119,9 +133,11 @@ func portknock(cfg *config) error {
 	var result string
 
 	// ensure DNS lookup cached or first ports may not be knocked
-	_, err := net.LookupHost(cfg.address)
-	if err != nil {
-		log.Printf("%s: %5s %s", cfg.address, "DNS", err.Error())
+	if !cfg.is_ip {
+		_, err := net.LookupHost(cfg.address)
+		if err != nil {
+			log.Printf("%s: %5s %s", cfg.address, "DNS", err.Error())
+		}
 	}
 
 	delay := time.NewTicker(cfg.delay)
@@ -136,7 +152,6 @@ func portknock(cfg *config) error {
 
 		if err == nil && con != nil {
 			result = "open"
-
 			con.Close()
 		}
 
