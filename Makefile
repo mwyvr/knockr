@@ -13,7 +13,7 @@ build:
 nocgo:
 	CGO_ENABLED=0 go build -v -ldflags="$(LDFLAGS)"
 
-install: build
+install: build man
 	mkdir -p $(BINDIR) $(MANDIR)
 	install -m 755 $(BINARY) $(BINDIR)/$(BINARY)
 	install -m 644 knockr.1 $(MANDIR)/knockr.1

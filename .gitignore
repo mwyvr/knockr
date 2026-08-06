@@ -13,3 +13,6 @@
 
 dist/
 knockr
+
+# generated from knockr.1.scd via `make man`
+knockr.1

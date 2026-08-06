@@ -26,6 +26,9 @@ Without CGO:
     make install                          # to ~/.local (bin, share/man)
     sudo make install PREFIX=/usr/local   # system-wide
 
+Generating the man page requires [scdoc](https://git.sr.ht/~sircmpwn/scdoc),
+packaged in most distributions.
+
 ### Pre-built binaries
 
 The [releases page](https://github.com/mwyvr/knockr/releases) provides binaries
