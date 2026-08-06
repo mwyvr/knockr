@@ -17,6 +17,10 @@ builds:
 
 archives:
   - formats: [ 'tar.gz' ]
+    files:
+      - LICENSE
+      - README.md
+      - knockr.1
     # this name template makes the OS and Arch compatible with the results of `uname`.
     name_template: >-
       {{ .ProjectName }}_
