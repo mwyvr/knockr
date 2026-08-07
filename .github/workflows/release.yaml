@@ -1,0 +1,27 @@
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  goreleaser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # goreleaser needs full history and tags for the changelog
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      - name: install scdoc (make man before-hook)
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq scdoc
+      - uses: goreleaser/goreleaser-action@v6
+        with:
+          version: '~> v2'
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
